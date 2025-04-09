@@ -33,7 +33,7 @@ app.get("/api/departments/:id", async (req, res, next) => {
 
 app.post("/api/department", async (req, res, next) => {
     try {
-      const { name, bio, profileImage, contactInfo, departmentId  } = req.body;
+      const { name, description, image, contactInfo   } = req.body;
       const department = await prisma.department.create({
         data: { name, description, image, contactInfo },
       });
@@ -129,7 +129,67 @@ app.delete("/api/faculty/:id", async (req, res, next) => {
     }
 });
 
+app.get("/api/admin", async (req, res, next) => {
+    try {
+        const admin = await prisma.department.findMany();
+        res.json(admin);
+    } catch (error) {
+        next();
+    }
+});
 
+app.get("/api/admin/:id", async (req, res, next) => {
+    try {
+      const id = +req.params.id;
+      const admin = await prisma.admin.findUnique( { where: {id } });
+      if (!admin) {
+        const error = new Error("Admin not found");
+        throw error;
+      }
+      res.json(admin);
+    } catch (error) {
+      next();
+    }
+});
+
+app.post("/api/admin", async (req, res, next) => {
+    try {
+    const { email, password } = req.body;
+    const admin = await prisma.admin.create({
+        data: { email, password },
+    });
+    res.json(admin);
+    } catch (error) {
+      next();
+    }
+});
+
+app.put("/api/admin/:id", async (req, res, next) => {
+   try {
+    const id = +req.params.id;
+    const { email, password } = req.body;
+    const admin = await prisma.admin.update({
+        where: {id},
+        data: { username, password },
+    });
+    res.json(admin);
+   } catch (error) {
+    next();
+   }
+});
+
+app.delete("/api/admin/:id", async (req, res, next) => {
+  try {
+    const id = +req.params.id;
+    await prisma.department.delete( { where: { id }} );
+    res.sendStatus(204);
+  } catch (error) {
+    next();
+  }
+});
+
+
+ 
 app.use((err, req, res, next) => {
     console.error(err);
     const status = err.status ?? 500;
