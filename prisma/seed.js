@@ -1,6 +1,18 @@
+const bcrypt = require("bcrypt");
 const prisma = require("../prisma");
 const seed = async () => {
     
+const createAdmins = async () => {
+    const hashedPassword = await bcrypt.hash("admin123", 10);
+
+    await prisma.admin.create({
+        data: {
+            email: "admin@fsa.edu",
+            password: hashedPassword,
+        }
+    });
+}
+
 
 const createDepartments = async () => {
     const departments = [
@@ -141,6 +153,7 @@ const createFaculty = async () => {
         await prisma.faculty.createMany( { data: faculty } );
 };
 
+await createAdmins();
 await createDepartments();
 await createFaculty();
 
