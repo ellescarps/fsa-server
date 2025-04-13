@@ -1,17 +1,51 @@
 const bcrypt = require("bcrypt");
+const saltRounds = 10;
 const prisma = require("../prisma");
-const seed = async () => {
-    
-const createAdmins = async () => {
-    const hashedPassword = await bcrypt.hash("admin123", 10);
 
-    await prisma.admin.create({
-        data: {
-            email: "admin@fsa.edu",
-            password: hashedPassword,
+
+const seed = async () => {
+
+    const registerAndPromoteToAdmin = async (email, password) => {
+        // Check if the email already exists in the admin table
+        const existingAdmin = await prisma.admin.findUnique({
+            where: { email: email },
+        });
+
+        // If the admin doesn't exist, create a new admin
+        if (!existingAdmin) {
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+            await prisma.admin.create({
+                data: {
+                    email: email,
+                    password: hashedPassword,
+                },
+            });
+
+            console.log(`Registered and promoted ${email} to admin.`);
+        } else {
+            console.log(`Admin already exists for email: ${email}`);
         }
-    });
-}
+    };
+
+    //  add any users to register as admins here
+    const usersToRegister = [
+        {
+            email: "user1@fsa.edu",
+            password: "password123",
+        },
+        {
+            email: "user2@fsa.edu",
+            password: "password456",
+        },
+        // Add more users as needed
+    ];
+
+    for (let user of usersToRegister) {
+        await registerAndPromoteToAdmin(user.email, user.password);
+    }
+
+
 
 
 const createDepartments = async () => {
@@ -27,12 +61,13 @@ const createDepartments = async () => {
             description: "covers Black US and Global History, Intersectional Revolutionary Movements, and Black Panther Party Initiatives",
             image: "https://logos-world.net/wp-content/uploads/2022/03/Black-Panther-Party-Symbol.png",
             contactInfo: "ushistory@fsa.edu",
+            
         },
         {
             name: "Ancient Civilizations",
             description: "covers ancient Rome, Egypt, and Greek History and Mythology",
             image: "https://as1.ftcdn.net/jpg/04/68/55/80/1000_F_468558071_6FGbhj0iERsCHUff6XwBwP53DwRrfcC8.jpg",
-            contactInfo: "ancientCivi@fsa.edu"
+            contactInfo: "ancientCivi@fsa.edu",
         },
         {
             name: "Math",
@@ -66,7 +101,7 @@ const createDepartments = async () => {
 const createFaculty = async () => {
     const faculty = [
         {
-         name: " George Feeny",
+         name: "George Feeny",
          bio: "the secret of life is people change people..it's about what us does for them. As a professor, I guide my students through introspective discussions. We read and learn to analyze material within the aspects that relates to each unique student.",   
          profileImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQemoPwPn6Dl6vjDQdMOdlWWw_pvyj8a-Oerg&s",
          contactInfo: "mrfeeny@fsa.edu",
@@ -116,7 +151,7 @@ const createFaculty = async () => {
         },
         {
          name: "Mr. Johnson",
-         bio: "A dream can be a distraction just as easy as it can be a goal. We will learn techniques to apply ourselves so that we meet our goals as tangible as we can make the dream that will follow it feel.",
+         bio: "A dream can be a distraction just as easy as it can be a goal. We will learn techniques to apply ourselves so that we meet our goals as tangible as we can make the dream that will follow it to feel.",
          profileImage: "https://pbs.twimg.com/media/GOXwe-KXYAAcm-K?format=jpg&name=large",
          contactInfo: "mrjohnson@fsa.edu",
          departmentId: 7,
@@ -153,13 +188,13 @@ const createFaculty = async () => {
         await prisma.faculty.createMany( { data: faculty } );
 };
 
-await createAdmins();
+
+
 await createDepartments();
 await createFaculty();
 
-
-
 };
+
 seed()
     .then(async () => await prisma.$disconnect())
     .catch(async (e) => {
