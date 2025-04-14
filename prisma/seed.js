@@ -115,10 +115,10 @@ const createFaculty = async () => {
          departmentId: 3,
         },
         {
-         name: "Madeira Edwards",
+         name: "Maya Angelou",
          bio: "I enjoy introducing students to intersectional history, covering movements that include all communities that usually tend to be left out of the US education system. We are all interconnected and we can not be free until we are all free; we'll learn from revolutionary figures and movements and exercise how we can put into practice impactful actions every day to prevent the continuing nefarious cycles history reiterates",
          profileImage: "https://www.victoryforwomen.org/sites/default/files/share_bundle/Maya%20Angelou.jpg",
-         contactInfo: "madeiraed@fsa.edu",
+         contactInfo: "maya@fsa.edu",
          departmentId: 2,
         },
         {
